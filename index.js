@@ -1,63 +1,63 @@
-const { existsSync } = require("fs");
-const { join } = require("path");
-const bodyParser = require("body-parser");
-const glob = require("glob");
-const assert = require("assert");
-const chokidar = require("chokidar");
-const pathToRegexp = require("path-to-regexp");
-const register = require("@babel/register");
-const debug = console.log;
+"use strict";
 
-const VALID_METHODS = ["get", "post", "put", "patch", "delete"];
-const BODY_PARSED_METHODS = ["post", "put", "patch"];
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _require = require("fs"),
+    existsSync = _require.existsSync;
+
+var _require2 = require("path"),
+    join = _require2.join;
+
+var bodyParser = require("body-parser");
+var glob = require("glob");
+var assert = require("assert");
+var chokidar = require("chokidar");
+var pathToRegexp = require("path-to-regexp");
+var register = require("@babel/register");
+var debug = console.log;
+
+var VALID_METHODS = ["get", "post", "put", "patch", "delete"];
+var BODY_PARSED_METHODS = ["post", "put", "patch"];
 
 function getMockMiddleware(path) {
-  const absMockPath = join(path, "mock");
-  const absConfigPath = join(path, ".umirc.mock.js");
+  var absMockPath = join(path, "mock");
+  var absConfigPath = join(path, ".umirc.mock.js");
   register({
     presets: ["umi"],
-    plugins: [
-      require.resolve("babel-plugin-add-module-exports"),
-      require.resolve("@babel/plugin-transform-modules-commonjs"),
-    ],
+    plugins: [require.resolve("babel-plugin-add-module-exports"), require.resolve("@babel/plugin-transform-modules-commonjs")],
     babelrc: false,
     only: [absMockPath]
   });
 
-  let mockData = getConfig();
+  var mockData = getConfig();
   watch();
 
   function watch() {
     if (process.env.WATCH_FILES === "none") return;
-    const watcher = chokidar.watch([absConfigPath, absMockPath], {
+    var watcher = chokidar.watch([absConfigPath, absMockPath], {
       ignoreInitial: true
     });
-    watcher.on("all", (event, file) => {
-      debug(`[${event}] ${file}, reload mock data`);
+    watcher.on("all", function (event, file) {
+      debug("[" + event + "] " + file + ", reload mock data");
       mockData = getConfig();
     });
   }
 
   function getConfig() {
     cleanRequireCache();
-    let ret = null;
+    var ret = null;
     if (existsSync(absConfigPath)) {
-      debug(`load mock data from ${absConfigPath}`);
+      debug("load mock data from " + absConfigPath);
       ret = require(absConfigPath); // eslint-disable-line
     } else {
-      const mockFiles = glob.sync("**/*.js", {
+      var mockFiles = glob.sync("**/*.js", {
         cwd: absMockPath
       });
-      debug(
-        `load mock data from ${absMockPath}, including files ${JSON.stringify(
-          mockFiles
-        )}`
-      );
-      ret = mockFiles.reduce((memo, mockFile) => {
-        memo = {
-          ...memo,
-          ...require(join(absMockPath, mockFile)) // eslint-disable-line
-        };
+      debug("load mock data from " + absMockPath + ", including files " + JSON.stringify(mockFiles));
+      ret = mockFiles.reduce(function (memo, mockFile) {
+        memo = _extends({}, memo, require(join(absMockPath, mockFile)));
         return memo;
       }, {});
     }
@@ -65,34 +65,27 @@ function getMockMiddleware(path) {
   }
 
   function parseKey(key) {
-    let method = "get";
-    let path = key;
+    var method = "get";
+    var path = key;
     if (key.indexOf(" ") > -1) {
-      const splited = key.split(" ");
+      var splited = key.split(" ");
       method = splited[0].toLowerCase();
       path = splited[1]; // eslint-disable-line
     }
-    assert(
-      VALID_METHODS.includes(method),
-      `Invalid method ${method} for path ${path}, please check your mock files.`
-    );
+    assert(VALID_METHODS.includes(method), "Invalid method " + method + " for path " + path + ", please check your mock files.");
     return {
-      method,
-      path
+      method: method,
+      path: path
     };
   }
 
   function createHandler(method, path, handler) {
-    return function(req, res, next) {
+    return function (req, res, next) {
       if (BODY_PARSED_METHODS.includes(method)) {
-        bodyParser.json({ limit: "5mb", strict: false })(req, res, () => {
-          bodyParser.urlencoded({ limit: "5mb", extended: true })(
-            req,
-            res,
-            () => {
-              sendData();
-            }
-          );
+        bodyParser.json({ limit: "5mb", strict: false })(req, res, function () {
+          bodyParser.urlencoded({ limit: "5mb", extended: true })(req, res, function () {
+            sendData();
+          });
         });
       } else {
         sendData();
@@ -109,21 +102,22 @@ function getMockMiddleware(path) {
   }
 
   function normalizeConfig(config) {
-    return Object.keys(config).reduce((memo, key) => {
-      const handler = config[key];
-      const type = typeof handler;
-      assert(
-        type === "function" || type === "object",
-        `mock value of ${key} should be function or object, but got ${type}`
-      );
-      const { method, path } = parseKey(key);
-      const keys = [];
-      const re = pathToRegexp(path, keys);
+    return Object.keys(config).reduce(function (memo, key) {
+      var handler = config[key];
+      var type = typeof handler === "undefined" ? "undefined" : _typeof(handler);
+      assert(type === "function" || type === "object", "mock value of " + key + " should be function or object, but got " + type);
+
+      var _parseKey = parseKey(key),
+          method = _parseKey.method,
+          path = _parseKey.path;
+
+      var keys = [];
+      var re = pathToRegexp(path, keys);
       memo.push({
-        method,
-        path,
-        re,
-        keys,
+        method: method,
+        path: path,
+        re: re,
+        keys: keys,
         handler: createHandler(method, path, handler)
       });
       return memo;
@@ -131,7 +125,7 @@ function getMockMiddleware(path) {
   }
 
   function cleanRequireCache() {
-    Object.keys(require.cache).forEach(file => {
+    Object.keys(require.cache).forEach(function (file) {
       if (file === absConfigPath || file.indexOf(absMockPath) > -1) {
         delete require.cache[file];
       }
@@ -139,26 +133,50 @@ function getMockMiddleware(path) {
   }
 
   function matchMock(req) {
-    const { path: exceptPath } = req;
-    const exceptMethod = req.method.toLowerCase();
-    for (const mock of mockData) {
-      const { method, re, keys } = mock;
-      if (method === exceptMethod) {
-        const match = re.exec(req.path);
-        if (match) {
-          const params = {};
+    var exceptPath = req.path;
 
-          for (let i = 1; i < match.length; i = i + 1) {
-            const key = keys[i - 1];
-            const prop = key.name;
-            const val = decodeParam(match[i]);
+    var exceptMethod = req.method.toLowerCase();
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-            if (val !== undefined || !hasOwnProperty.call(params, prop)) {
-              params[prop] = val;
+    try {
+      for (var _iterator = mockData[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var mock = _step.value;
+        var method = mock.method,
+            re = mock.re,
+            keys = mock.keys;
+
+        if (method === exceptMethod) {
+          var match = re.exec(req.path);
+          if (match) {
+            var params = {};
+
+            for (var i = 1; i < match.length; i = i + 1) {
+              var key = keys[i - 1];
+              var prop = key.name;
+              var val = decodeParam(match[i]);
+
+              if (val !== undefined || !hasOwnProperty.call(params, prop)) {
+                params[prop] = val;
+              }
             }
+            req.params = params;
+            return mock;
           }
-          req.params = params;
-          return mock;
+        }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
         }
       }
     }
@@ -172,7 +190,7 @@ function getMockMiddleware(path) {
         return decodeURIComponent(val);
       } catch (err) {
         if (err instanceof URIError) {
-          err.message = `Failed to decode param ' ${val} '`;
+          err.message = "Failed to decode param ' " + val + " '";
           err.status = err.statusCode = 400;
         }
 
@@ -180,16 +198,19 @@ function getMockMiddleware(path) {
       }
     }
 
-    return mockData.filter(({ method, re }) => {
+    return mockData.filter(function (_ref) {
+      var method = _ref.method,
+          re = _ref.re;
+
       return method === exceptMethod && re.test(exceptPath);
     })[0];
   }
 
-  return (req, res, next) => {
-    const match = matchMock(req);
+  return function (req, res, next) {
+    var match = matchMock(req);
 
     if (match) {
-      debug(`mock matched: [${match.method}] ${match.path}`);
+      debug("mock matched: [" + match.method + "] " + match.path);
       return match.handler(req, res, next);
     } else {
       return next();
