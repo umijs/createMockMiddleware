@@ -1,6 +1,6 @@
 {
   "name": "create-mock-middleware",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An express middleware that reads the umi mock",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/umijs/createMockMiddleware#readme",
   "dependencies": {
     "assert": "^1.4.1",
+    "body-parser": "^1.18.3",
     "chokidar": "^2.0.4",
     "glob": "^7.1.2",
     "mockjs": "^1.0.1-beta3",
@@ -33,11 +34,11 @@
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.46",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-dynamic-import-node-sync": "^2.0.1",
     "@babel/plugin-transform-modules-commonjs": "7.0.0-beta.46",
     "@babel/register": "7.0.0-beta.46",
     "@babel/runtime": "7.0.0-beta.46",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-dynamic-import-node-sync": "^2.0.1",
     "babel-preset-umi": "^0.3.0",
     "express": "^4.16.3"
   }
