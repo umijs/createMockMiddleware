@@ -8,9 +8,6 @@ const pathToRegexp = require("path-to-regexp");
 const register = require("@babel/register");
 const debug = console.log;
 
-// api list show in '/'
-const ApiList = [];
-
 const VALID_METHODS = ["get", "post", "put", "patch", "delete"];
 const BODY_PARSED_METHODS = ["post", "put", "patch"];
 
@@ -63,14 +60,6 @@ function getMockMiddleware(path) {
         };
         return memo;
       }, {});
-      ret["GET /"] = (req, res) => {
-        res.send(
-          ApiList.map(url => {
-            const href = url.split(" /")[1];
-            return `<li><a href="${href}"><code>${url}</code></a></li>`;
-          }).join("")
-        );
-      };
     }
     return normalizeConfig(ret);
   }
