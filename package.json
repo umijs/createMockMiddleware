@@ -1,5 +1,5 @@
 {
-  "name": "createmockmiddleware",
+  "name": "create-mock-middleware",
   "version": "0.0.1",
   "description": "An express middleware that reads the umi mock",
   "main": "index.js",
