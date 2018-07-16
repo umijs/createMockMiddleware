@@ -110,7 +110,6 @@ function getMockMiddleware(path) {
 
   function normalizeConfig(config) {
     return Object.keys(config).reduce((memo, key) => {
-      ApiList.push(key);
       const handler = config[key];
       const type = typeof handler;
       assert(
@@ -197,4 +196,4 @@ function getMockMiddleware(path) {
     }
   };
 }
-exports.default = getMockMiddleware;
+module.exports = getMockMiddleware;
