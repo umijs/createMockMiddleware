@@ -37,8 +37,7 @@
     "@babel/runtime": "7.0.0-beta.46",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-dynamic-import-node-sync": "^2.0.1",
-    "babel-preset-umi": "^0.3.0",
-    "express": "^4.16.3"
+    "babel-preset-umi": "^0.3.0"
   },
   "devDependencies": {
     "express": "^4.16.3"
